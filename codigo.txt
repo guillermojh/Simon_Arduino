@@ -1,20 +1,67 @@
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+
+#define   BUZZER   7
+#define   ENTRADA_A  13
+#define   ENTRADA_B  12
+#define   ENTRADA_C  11
+#define   ENTRADA_D  10
+#define   SALIDA_A   2
+#define   SALIDA_B   3
+#define   SALIDA_C   4
+#define   SALIDA_D   5
+
+
+int melodia[ ] = {262, 196, 196, 220, 196, 0, 247, 262};
+int duracionNotas[] = {4, 8, 8, 4, 4, 4, 4, 4};
+int nivelActual = 1;
+int velocidad = 500;
+const int NIVEL_MAX = 100;
+int secuencia[NIVEL_MAX];
+int secuenciaUsuario[NIVEL_MAX];
+LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+
+
+void setup(){
+  initialize();
+  welcomeMessage();
+}
+
+void loop(){
+  lcd.setCursor( 0, 1 );
+  lcd.print("NIVEL:    ");
+  lcd.setCursor( 7, 1 );
+  lcd.print(nivelActual);
+  lcd.setCursor( 9, 1 );
+  lcd.print("      ");
+
+   if(nivelActual == 1){
+      generaSecuencia();
+      muestraSecuencia();
+      leeSecuencia();
+   }
+   if(nivelActual != 1){
+      muestraSecuencia();
+      leeSecuencia();
+   }
+}
 
 void initialize() {
   pinMode(ENTRADA_D, INPUT);
-  pinMode(ENTRADA_C, INPUT);
-  pinMode(ENTRADA_B, INPUT);
-  pinMode(ENTRADA_A, INPUT);
-  pinMode(SALIDA_A, OUTPUT);
-  pinMode(SALIDA_B, OUTPUT);
-  pinMode(SALIDA_C, OUTPUT);
-  pinMode(SALIDA_D, OUTPUT);
-  digitalWrite(SALIDA_A, LOW);
-  digitalWrite(SALIDA_B, LOW);
-  digitalWrite(SALIDA_C, LOW);
-  digitalWrite(SALIDA_D, LOW);
-  lcd.init();
-  lcd.backlight();
-  lcd.clear();
+   pinMode(ENTRADA_C, INPUT);
+   pinMode(ENTRADA_B, INPUT);
+   pinMode(ENTRADA_A, INPUT);
+   pinMode(SALIDA_A, OUTPUT);
+   pinMode(SALIDA_B, OUTPUT);
+   pinMode(SALIDA_C, OUTPUT);
+   pinMode(SALIDA_D, OUTPUT);
+   digitalWrite(SALIDA_A, LOW);
+   digitalWrite(SALIDA_B, LOW);
+   digitalWrite(SALIDA_C, LOW);
+   digitalWrite(SALIDA_D, LOW);
+   lcd.init();
+   lcd.backlight();
+   lcd.clear();
 }
 
 void welcomeMessage() {
@@ -65,6 +112,7 @@ void muestraSecuencia(){
       delay(200);
    }
 }
+
 
 void leeSecuencia(){
    int flag = 0;
@@ -137,37 +185,40 @@ void leeSecuencia(){
    secuenciaCorrecta();
 }
 
-void melodiaError(){
-  for(int i = 0; i < 8; i++){
-    int duracionNota = 1000/duracionNotas[i];
-    tone(BUZZER, melodia[i],duracionNotas);
-    int pausaEntreNotas = duracionNota * 1.30;
-    delay(pausaEntreNotas);
-    noTone(BUZZER);
-  }
-}
 
+
+
+
+
+void melodiaError(){
+   for(int i = 0; i < 8; i++){
+      int duracionNota = 1000/duracionNotas[i];
+      tone(BUZZER, melodia[i],duracionNotas);
+      int pausaEntreNotas = duracionNota * 1.30;
+      delay(pausaEntreNotas);
+      noTone(BUZZER);
+   }
+}
 void secuenciaError(){
   lcd.setCursor( 10, 1 );
   lcd.print("Error");
   melodiaError();
-  digitalWrite(SALIDA_A, HIGH);
-  digitalWrite(SALIDA_B, HIGH);
-  digitalWrite(SALIDA_C, HIGH);
-  digitalWrite(SALIDA_D, HIGH);
-  delay(250);
-  digitalWrite(SALIDA_A, LOW);
-  digitalWrite(SALIDA_B, LOW);
-  digitalWrite(SALIDA_C, LOW);
-  digitalWrite(SALIDA_D, LOW);
-  delay(250);
+   digitalWrite(SALIDA_A, HIGH);
+   digitalWrite(SALIDA_B, HIGH);
+   digitalWrite(SALIDA_C, HIGH);
+   digitalWrite(SALIDA_D, HIGH);
+   delay(250);
+   digitalWrite(SALIDA_A, LOW);
+   digitalWrite(SALIDA_B, LOW);
+   digitalWrite(SALIDA_C, LOW);
+   digitalWrite(SALIDA_D, LOW);
+   delay(250);
   lcd.setCursor( 0, 1 );
   lcd.print("  Fin Del Juego  ");
   delay(3000);
-  nivelActual = 1;
-  velocidad = 500;
+   nivelActual = 1;
+   velocidad = 500;
 }
-
 void secuenciaCorrecta(){
   if(nivelActual < NIVEL_MAX) {nivelActual++;} 
   velocidad -= 50;
